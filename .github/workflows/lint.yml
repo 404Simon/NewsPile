@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: write
+  checks: write # Added to allow check annotations
 
 jobs:
   quality:
@@ -24,6 +25,15 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
+          tools: composer:v2
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v3
+        with:
+          path: vendor
+          key: php-${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            php-${{ runner.os }}-composer-
 
       - name: Add Flux Credentials Loaded From ENV
         run: composer config http-basic.composer.fluxui.dev "${{ secrets.FLUX_USERNAME }}" "${{ secrets.FLUX_LICENSE_KEY }}"
@@ -35,6 +45,9 @@ jobs:
 
       - name: Run Pint
         run: vendor/bin/pint
+        
+      - name: Run PHPStan
+        run: vendor/bin/phpstan analyse --error-format=github --no-progress
 
       # - name: Commit Changes
       #   uses: stefanzweifel/git-auto-commit-action@v5
