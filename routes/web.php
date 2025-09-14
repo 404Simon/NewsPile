@@ -1,5 +1,8 @@
 <?php
 
+use App\Livewire\SearchProfileEdit;
+use App\Livewire\SearchProfileForm;
+use App\Livewire\SearchProfileOverview;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
@@ -12,6 +15,12 @@ Route::get('/', function () {
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('profiles', SearchProfileOverview::class)->name('profiles');
+    Route::get('profiles/create', SearchProfileForm::class)->name('profiles.create');
+    Route::get('profiles/{searchProfile}/edit', SearchProfileEdit::class)->name('profiles.edit');
+});
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
