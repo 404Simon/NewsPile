@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('genres', function (Blueprint $table): void {
             $table->id();
-            $table->string('name');
+            $table->string('name')->unique();
+            $table->json('synonyms')->nullable(); // JSON Array with synonyms, z. B. ["wissenschaftlich","science","sciences"]
             $table->timestamps();
         });
     }

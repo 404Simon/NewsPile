@@ -12,6 +12,10 @@ class Genre extends Model
 
     protected $fillable = ['name'];
 
+    protected $casts = [
+        'synonyms' => 'array',
+    ];
+
     public function articles(): BelongsToMany
     {
         return $this->belongsToMany(Article::class)
