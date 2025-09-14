@@ -2,10 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class NewsOutlet extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'name',
         'url',
@@ -13,8 +18,20 @@ class NewsOutlet extends Model
         'b64_logo',
     ];
 
-    public function genres()
+    public function articles(): HasMany
     {
-        return $this->belongsToMany(Genre::class, 'news_outlet_genre');
+        return $this->hasMany(Article::class);
+    }
+
+    public function genres(): BelongsToMany
+    {
+        return $this->belongsToMany(Genre::class, 'news_outlet_genre')
+            ->withTimestamps();
+    }
+
+    public function searchProfiles(): BelongsToMany
+    {
+        return $this->belongsToMany(SearchProfile::class)
+            ->withTimestamps();
     }
 }

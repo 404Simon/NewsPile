@@ -2,27 +2,41 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class SearchProfile extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'user_id',
         'name',
     ];
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function newsOutlets()
+    public function genres(): BelongsToMany
     {
-        return $this->belongsToMany(NewsOutlet::class, 'search_profile_news_outlet');
+        return $this->belongsToMany(Genre::class, 'search_profile_genre')
+            ->withTimestamps();
     }
 
-    public function articles()
+    public function newsOutlets(): BelongsToMany
     {
-        return $this->belongsToMany(Article::class, 'search_profile_article');
+        return $this->belongsToMany(NewsOutlet::class, 'search_profile_news_outlet')
+            ->withTimestamps();
+    }
+
+    public function articles(): BelongsToMany
+    {
+        return $this->belongsToMany(Article::class, 'search_profile_article')
+            ->withPivot('read_at')
+            ->withTimestamps();
     }
 }

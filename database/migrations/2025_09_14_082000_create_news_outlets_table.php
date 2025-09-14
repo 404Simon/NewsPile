@@ -11,18 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('articles', function (Blueprint $table) {
+        Schema::create('news_outlets', function (Blueprint $table): void {
             $table->id();
-            $table->string('title');
-            $table->text('content');
+            $table->string('name');
             $table->string('url');
-            $table->date('published_at');
+            $table->string('rss_url');
+            $table->string('b64_logo');
             $table->timestamps();
         });
 
-        Schema::create('article_genre', function (Blueprint $table) {
+        Schema::create('news_outlet_genre', function (Blueprint $table): void {
             $table->id();
-            $table->foreignId('article_id')->constrained()->onDelete('cascade');
+            $table->foreignId('news_outlet_id')->constrained()->onDelete('cascade');
             $table->foreignId('genre_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
@@ -33,6 +33,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('articles');
+        Schema::dropIfExists('news_outlet_genre');
+        Schema::dropIfExists('news_outlets');
     }
 };
