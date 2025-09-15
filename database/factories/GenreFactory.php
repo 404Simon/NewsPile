@@ -27,6 +27,7 @@ class GenreFactory extends Factory
 
         return [
             'name' => $this->faker->unique()->randomElement($genres),
+            'synonyms' => [],
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ];
