@@ -12,10 +12,6 @@ class SearchProfileOverview extends Component
 {
     use WithPagination;
 
-    public bool $showDeleteModal = false;
-
-    public ?SearchProfile $profileToDelete = null;
-
     #[Title('Search Profiles')]
     public function render(): View
     {
@@ -29,33 +25,9 @@ class SearchProfileOverview extends Component
         ]);
     }
 
-    public function confirmDelete(SearchProfile $profile): void
+    public function deleteProfile(SearchProfile $profile): void
     {
-        $this->profileToDelete = $profile;
-        $this->showDeleteModal = true;
-    }
-
-    public function delete(): void
-    {
-        if (! $this->profileToDelete) {
-            return;
-        }
-
-        $this->authorize('delete', $this->profileToDelete);
-
-        $this->profileToDelete->delete();
-
-        $this->resetModal();
-    }
-
-    public function cancelDelete(): void
-    {
-        $this->resetModal();
-    }
-
-    private function resetModal(): void
-    {
-        $this->profileToDelete = null;
-        $this->showDeleteModal = false;
+        $this->authorize('delete', $profile);
+        $profile->delete();
     }
 }
