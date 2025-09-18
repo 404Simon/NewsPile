@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Genre;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class GenreNormalizer
@@ -120,6 +121,8 @@ class GenreNormalizer
         }
 
         // no reaasonable match
+        Log::info("Could not match $rawGenre");
+
         return null;
     }
 }

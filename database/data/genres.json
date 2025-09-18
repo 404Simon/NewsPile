@@ -9,6 +9,34 @@
         ]
     },
     {
+        "name": "Deutschland",
+        "synonyms": [
+            "inland",
+            "gesellschaft",
+            "germany",
+            "de"
+        ]
+    },
+    {
+        "name": "Frankreich",
+        "synonyms": [
+            "fr",
+            "france"
+        ]
+    },
+    {
+        "name": "Ukraine",
+        "synonyms": [
+            "ua"
+        ]
+    },
+    {
+        "name": "Europa",
+        "synonyms": [
+            "eu"
+        ]
+    },
+    {
         "name": "Technologie",
         "synonyms": [
             "tech",
