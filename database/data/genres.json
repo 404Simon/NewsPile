@@ -1,0 +1,74 @@
+[
+    {
+        "name": "Finanzen",
+        "synonyms": [
+            "dax",
+            "finance",
+            "money",
+            "marktbericht"
+        ]
+    },
+    {
+        "name": "Deutschland",
+        "synonyms": [
+            "inland",
+            "gesellschaft",
+            "germany",
+            "de"
+        ]
+    },
+    {
+        "name": "Frankreich",
+        "synonyms": [
+            "fr",
+            "france"
+        ]
+    },
+    {
+        "name": "Ukraine",
+        "synonyms": [
+            "ua"
+        ]
+    },
+    {
+        "name": "Europa",
+        "synonyms": [
+            "eu"
+        ]
+    },
+    {
+        "name": "Technologie",
+        "synonyms": [
+            "tech",
+            "digital",
+            "computing",
+            "IT"
+        ]
+    },
+    {
+        "name": "Wissenschaft",
+        "synonyms": [
+            "scientific",
+            "research",
+            "academic",
+            "studies"
+        ]
+    },
+    {
+        "name": "Business",
+        "synonyms": [
+            "economy",
+            "finance",
+            "commerce",
+            "trade"
+        ]
+    },
+    {
+        "name": "Entertainment",
+        "synonyms": [
+            "media",
+            "arts",
+            "culture"
+        ]
+    }
+]
