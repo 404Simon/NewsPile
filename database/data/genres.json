@@ -1,0 +1,46 @@
+[
+    {
+        "name": "Finanzen",
+        "synonyms": [
+            "dax",
+            "finance",
+            "money",
+            "marktbericht"
+        ]
+    },
+    {
+        "name": "Technologie",
+        "synonyms": [
+            "tech",
+            "digital",
+            "computing",
+            "IT"
+        ]
+    },
+    {
+        "name": "Wissenschaft",
+        "synonyms": [
+            "scientific",
+            "research",
+            "academic",
+            "studies"
+        ]
+    },
+    {
+        "name": "Business",
+        "synonyms": [
+            "economy",
+            "finance",
+            "commerce",
+            "trade"
+        ]
+    },
+    {
+        "name": "Entertainment",
+        "synonyms": [
+            "media",
+            "arts",
+            "culture"
+        ]
+    }
+]
