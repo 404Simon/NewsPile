@@ -2,9 +2,6 @@
 
 use App\Models\Genre;
 use App\Services\GenreNormalizer;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(Tests\TestCase::class, RefreshDatabase::class);
 
 beforeEach(function () {
     Genre::factory()->create([

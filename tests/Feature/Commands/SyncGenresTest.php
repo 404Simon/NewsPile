@@ -3,10 +3,7 @@
 namespace Tests\Feature\Commands;
 
 use App\Models\Genre;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->tempJsonPath = storage_path('app/testing/genres-test.json');
