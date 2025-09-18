@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SearchProfile extends Model
 {
@@ -38,5 +39,16 @@ class SearchProfile extends Model
         return $this->belongsToMany(Article::class, 'search_profile_article')
             ->withPivot('read_at')
             ->withTimestamps();
+    }
+
+    public function executions(): HasMany
+    {
+        return $this->hasMany(SearchProfileExecution::class);
+    }
+
+    public function latestExecution(): ?SearchProfileExecution
+    {
+        /** @var SearchProfileExecution|null */
+        return $this->executions()->latest('executed_at')->first();
     }
 }
