@@ -21,28 +21,7 @@ class TagesschauRSSProcessor implements ShouldQueue
         Log::info('TagesschauRSSProcessor started');
 
         $pie = new SimplePie;
-
-        $cacheDir = storage_path('app/simplepie_cache');
-        if (! is_dir($cacheDir)) {
-            mkdir($cacheDir, 0755, true);
-        }
-
-        if (! is_writable($cacheDir)) {
-            chmod($cacheDir, 0755);
-
-            if (! is_writable($cacheDir)) {
-                Log::error("Cache directory is not writable: {$cacheDir}");
-                // Use system temp directory as fallback
-                $cacheDir = sys_get_temp_dir().'/simplepie_cache';
-                if (! is_dir($cacheDir)) {
-                    mkdir($cacheDir, 0755, true);
-                }
-            }
-        }
-
-        $pie->set_cache_location($cacheDir);
-        $pie->set_cache_duration(3600); // 1 hour
-        $pie->enable_cache(true);
+        $pie->enable_cache(false);
 
         $newsOutlet = NewsOutlet::query()->firstOrCreate(
             ['name' => 'Tagesschau'],
