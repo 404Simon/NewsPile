@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Jobs;
 
 use App\Models\Article;
@@ -11,8 +13,9 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use SimplePie\SimplePie;
+use Throwable;
 
-class TagesschauRSSProcessor implements ShouldQueue
+final class TagesschauRSSProcessor implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -68,7 +71,7 @@ class TagesschauRSSProcessor implements ShouldQueue
                     ]);
 
                     $processedCount++;
-                } catch (\Throwable $e) {
+                } catch (Throwable $e) {
                     Log::error('Error dispatching article processor: '.$e->getMessage(), [
                         'title' => $title,
                         'link' => $link,

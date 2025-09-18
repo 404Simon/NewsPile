@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Jobs\DispatchSearchProfileJobs;
 use App\Jobs\ProcessSearchProfile;
 use App\Models\Article;

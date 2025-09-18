@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Console\Commands;
 
 use App\Jobs\DispatchSearchProfileJobs;
 use Illuminate\Console\Command;
 
-class ExecuteSearchProfiles extends Command
+final class ExecuteSearchProfiles extends Command
 {
     /**
      * The name and signature of the console command.
@@ -24,7 +26,7 @@ class ExecuteSearchProfiles extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
     {
         $this->info('Starting Search Profile Execution...');
 

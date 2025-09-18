@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Livewire;
 
 use App\Models\Genre;
@@ -10,7 +12,7 @@ use Livewire\Attributes\Rule;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-class SearchProfileEdit extends Component
+final class SearchProfileEdit extends Component
 {
     public SearchProfile $searchProfile;
 

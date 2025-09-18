@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Models\Article;
@@ -10,7 +12,7 @@ use Illuminate\Support\Carbon;
 /**
  * @extends Factory<Article>
  */
-class ArticleFactory extends Factory
+final class ArticleFactory extends Factory
 {
     /**
      * Define the model's default state.

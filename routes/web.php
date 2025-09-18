@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Livewire\SearchProfileEdit;
 use App\Livewire\SearchProfileForm;
 use App\Livewire\SearchProfileOverview;

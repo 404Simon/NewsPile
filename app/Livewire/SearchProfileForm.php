@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Livewire;
 
 use App\Models\Genre;
@@ -9,7 +11,7 @@ use Livewire\Attributes\Rule;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-class SearchProfileForm extends Component
+final class SearchProfileForm extends Component
 {
     #[Rule('required|string|max:255')]
     public string $name = '';

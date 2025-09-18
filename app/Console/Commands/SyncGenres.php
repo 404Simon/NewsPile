@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Console\Commands;
 
 use App\Models\Genre;
@@ -13,7 +15,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use JsonException;
 
-class SyncGenres extends Command
+final class SyncGenres extends Command
 {
     protected $signature = 'app:sync-genres {--path=database/data/genres.json : Path to the JSON file containing genres} {--force : Force delete genres not in the JSON file without asking}';
 
@@ -59,7 +61,7 @@ class SyncGenres extends Command
             throw ValidationException::withMessages(['genres' => 'The genres file cannot be empty.']);
         }
 
-        $genres->each(function ($genre, $index) {
+        $genres->each(function ($genre, $index): void {
             $validator = Validator::make($genre, [
                 'name' => 'required|string|max:255',
                 'synonyms' => 'nullable|array',
@@ -77,7 +79,7 @@ class SyncGenres extends Command
 
     private function syncGenres(Collection $genres): void
     {
-        DB::transaction(function () use ($genres) {
+        DB::transaction(function () use ($genres): void {
             $existingGenres = Genre::query()->select(['id', 'name'])->get()->keyBy('name');
             $stats = ['created' => 0, 'updated' => 0];
 
@@ -120,7 +122,7 @@ class SyncGenres extends Command
         });
     }
 
-    private function logError(string $message, \Exception $e): void
+    private function logError(string $message, Exception $e): void
     {
         $errorMsg = "{$message}: ".$e->getMessage();
         $this->error($errorMsg);

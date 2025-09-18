@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Models\SearchProfile;
@@ -10,7 +12,7 @@ use Illuminate\Support\Carbon;
 /**
  * @extends Factory<SearchProfile>
  */
-class SearchProfileFactory extends Factory
+final class SearchProfileFactory extends Factory
 {
     /**
      * Define the model's default state.

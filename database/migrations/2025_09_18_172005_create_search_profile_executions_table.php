@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -11,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('search_profile_executions', function (Blueprint $table) {
+        Schema::create('search_profile_executions', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('search_profile_id')->constrained()->onDelete('cascade');
             $table->timestamp('executed_at');

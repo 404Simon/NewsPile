@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\Article;
 use App\Models\Genre;
 use App\Models\NewsOutlet;
@@ -32,5 +34,5 @@ test('genre has news outlets', function (): void {
 
 test('genre name is required', function (): void {
     expect(fn () => Genre::factory()->create(['name' => null]))
-        ->toThrow(\Exception::class);
+        ->toThrow(Exception::class);
 });

@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Console\Commands;
 
 use App\Jobs\TagesschauRSSProcessor;
 use Illuminate\Console\Command;
 
-class ProcessTagesschauFeed extends Command
+final class ProcessTagesschauFeed extends Command
 {
     /**
      * The name and signature of the console command.

@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
 use App\Models\SearchProfile;
 use App\Models\User;
 
-class SearchProfilePolicy
+final class SearchProfilePolicy
 {
     /**
      * Determine whether the user can view any models.
      */
-    public function viewAny(User $user): bool
+    public function viewAny(): bool
     {
         return true;
     }
@@ -26,7 +28,7 @@ class SearchProfilePolicy
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function create(): bool
     {
         return true;
     }
@@ -50,7 +52,7 @@ class SearchProfilePolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, SearchProfile $searchProfile): bool
+    public function restore(): bool
     {
         return false;
     }
@@ -58,7 +60,7 @@ class SearchProfilePolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, SearchProfile $searchProfile): bool
+    public function forceDelete(): bool
     {
         return false;
     }

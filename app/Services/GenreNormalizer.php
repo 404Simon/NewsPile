@@ -1,47 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Models\Genre;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-class GenreNormalizer
+final class GenreNormalizer
 {
-    protected array $genres;
+    private array $genres;
 
-    protected int $maxLevenshteinDistance;
-
-    protected float $minSimilarityPercent;
-
-    public function __construct(int $maxLevenshteinDistance = 3, float $minSimilarityPercent = 70.0)
+    public function __construct(private readonly int $maxLevenshteinDistance = 3, private readonly float $minSimilarityPercent = 70.0)
     {
-        $this->maxLevenshteinDistance = $maxLevenshteinDistance;
-        $this->minSimilarityPercent = $minSimilarityPercent;
         $this->loadGenres();
-    }
-
-    protected function loadGenres(): void
-    {
-        $this->genres = Genre::all()->map(function (Genre $genre) {
-            return [
-                'id' => $genre->id,
-                'name' => $genre->name,
-                'name_norm' => $this->normalizeString($genre->name),
-                'synonyms' => collect($genre->synonyms ?? [])->map(fn ($s) => $this->normalizeString($s))->all(),
-            ];
-        })->all();
-    }
-
-    protected function normalizeString(string $s): string
-    {
-        $s = mb_strtolower(trim($s));
-        $s = Str::ascii($s); // ä -> a etc.
-        // only alphanumeric + spaces
-        $s = preg_replace('/[^a-z0-9 ]+/', ' ', $s);
-        $s = preg_replace('/\s+/', ' ', $s);
-
-        return trim($s);
     }
 
     public function match(string $rawGenre): ?Genre
@@ -81,7 +54,7 @@ class GenreNormalizer
             }
 
             // similar_text
-            similar_text($key, $g['name_norm'], $percentName);
+            similar_text($key, (string) $g['name_norm'], $percentName);
             if ($percentName > $best['similarity']) {
                 $best = [
                     'genre' => Genre::find($g['id']),
@@ -100,7 +73,7 @@ class GenreNormalizer
                         'similarity' => 0.0,
                     ];
                 }
-                similar_text($key, $synNorm, $percentSyn);
+                similar_text($key, (string) $synNorm, $percentSyn);
                 if ($percentSyn > $best['similarity']) {
                     $best = [
                         'genre' => Genre::find($g['id']),
@@ -124,5 +97,26 @@ class GenreNormalizer
         Log::info("Could not match $rawGenre");
 
         return null;
+    }
+
+    private function loadGenres(): void
+    {
+        $this->genres = Genre::all()->map(fn (Genre $genre): array => [
+            'id' => $genre->id,
+            'name' => $genre->name,
+            'name_norm' => $this->normalizeString($genre->name),
+            'synonyms' => collect($genre->synonyms ?? [])->map(fn ($s): string => $this->normalizeString($s))->all(),
+        ])->all();
+    }
+
+    private function normalizeString(string $s): string
+    {
+        $s = mb_strtolower(mb_trim($s));
+        $s = Str::ascii($s); // ä -> a etc.
+        // only alphanumeric + spaces
+        $s = preg_replace('/[^a-z0-9 ]+/', ' ', $s);
+        $s = preg_replace('/\s+/', ' ', (string) $s);
+
+        return mb_trim($s);
     }
 }

@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Jobs;
 
 use App\Models\SearchProfile;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
-class DispatchSearchProfileJobs implements ShouldQueue
+final class DispatchSearchProfileJobs implements ShouldQueue
 {
     use Queueable;
 
@@ -23,7 +25,7 @@ class DispatchSearchProfileJobs implements ShouldQueue
      */
     public function handle(): void
     {
-        SearchProfile::query()->chunk(100, function ($searchProfiles) {
+        SearchProfile::query()->chunk(100, function ($searchProfiles): void {
             foreach ($searchProfiles as $searchProfile) {
                 ProcessSearchProfile::dispatch($searchProfile);
             }

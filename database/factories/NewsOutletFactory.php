@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Models\NewsOutlet;
@@ -9,7 +11,7 @@ use Illuminate\Support\Carbon;
 /**
  * @extends Factory<NewsOutlet>
  */
-class NewsOutletFactory extends Factory
+final class NewsOutletFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -19,7 +21,7 @@ class NewsOutletFactory extends Factory
     public function definition(): array
     {
         $name = $this->faker->company();
-        $domain = strtolower(str_replace(' ', '', $name)).'.com';
+        $domain = mb_strtolower(str_replace(' ', '', $name)).'.com';
 
         return [
             'name' => $name,

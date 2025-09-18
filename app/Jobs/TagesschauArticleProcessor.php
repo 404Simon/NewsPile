@@ -1,10 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Jobs;
 
 use App\Models\Article;
 use App\Services\GenreNormalizer;
+use DOMDocument;
 use DOMElement;
+use DOMXPath;
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -15,8 +20,9 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use League\HTMLToMarkdown\HtmlConverter;
+use Throwable;
 
-class TagesschauArticleProcessor implements ShouldQueue
+final class TagesschauArticleProcessor implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -31,17 +37,14 @@ class TagesschauArticleProcessor implements ShouldQueue
     public int $backoff = 10;
 
     /**
-     * The article data to process.
-     */
-    protected array $articleData;
-
-    /**
      * Create a new job instance.
      */
-    public function __construct(array $articleData)
-    {
-        $this->articleData = $articleData;
-    }
+    public function __construct(
+        /**
+         * The article data to process.
+         */
+        private array $articleData
+    ) {}
 
     /**
      * Execute the job.
@@ -72,9 +75,9 @@ class TagesschauArticleProcessor implements ShouldQueue
             if ($response->successful()) {
                 $html = $response->body();
 
-                $dom = new \DOMDocument;
+                $dom = new DOMDocument;
                 @$dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
-                $xpath = new \DOMXPath($dom);
+                $xpath = new DOMXPath($dom);
 
                 $content = '';
                 $elements = $xpath->query('//article//p[contains(@class, "textabsatz")] | //article//h2');
@@ -90,7 +93,7 @@ class TagesschauArticleProcessor implements ShouldQueue
                 $allRawGenres = $htmlGenres->merge($urlGenres)->unique();
                 $normalizedGenres = $this->normalizeGenres($allRawGenres);
 
-                if (! empty($content)) {
+                if ($content !== '' && $content !== '0') {
                     $converter = new HtmlConverter(['strip_tags' => true, 'header_style' => 'atx']);
                     $markdown = $converter->convert($content);
 
@@ -133,12 +136,12 @@ class TagesschauArticleProcessor implements ShouldQueue
                 ]);
 
                 // Throw an exception to trigger job retry
-                throw new \Exception('HTTP request failed with status '.$response->status());
+                throw new Exception('HTTP request failed with status '.$response->status());
             }
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Log::error('Error processing article content: '.$e->getMessage(), [
                 'url' => $url,
-                'exception' => get_class($e),
+                'exception' => $e::class,
                 'trace' => $e->getTraceAsString(),
             ]);
 
@@ -150,19 +153,19 @@ class TagesschauArticleProcessor implements ShouldQueue
     /**
      * Extract genres from HTML taglist
      */
-    protected function extractGenresFromHtml(\DOMXPath $xpath): Collection
+    private function extractGenresFromHtml(DOMXPath $xpath): Collection
     {
         $tagElements = $xpath->query('//ul[contains(@class, "taglist")]//li[contains(@class, "taglist__element")]//a[contains(@class, "tag-btn")]');
 
         return collect($tagElements)
-            ->map(fn (DOMElement $element) => trim($element->textContent))
-            ->filter(fn (string $text) => ! empty($text));
+            ->map(fn (DOMElement $element): string => mb_trim($element->textContent))
+            ->filter(fn (string $text): bool => $text !== '' && $text !== '0');
     }
 
     /**
      * Extract genres from URL segments
      */
-    protected function extractGenresFromUrl(string $url): Collection
+    private function extractGenresFromUrl(string $url): Collection
     {
         $parsedUrl = parse_url($url);
 
@@ -174,13 +177,13 @@ class TagesschauArticleProcessor implements ShouldQueue
 
         return collect(explode('/', $path))
             ->filter()
-            ->filter(fn (string $segment) => ! Str::contains($segment, '.html') && strlen($segment) > 2);
+            ->filter(fn (string $segment): bool => ! Str::contains($segment, '.html') && mb_strlen($segment) > 2);
     }
 
     /**
      * Normalize genres using the GenreNormalizer service
      */
-    protected function normalizeGenres(Collection $rawGenres): Collection
+    private function normalizeGenres(Collection $rawGenres): Collection
     {
         $normalizer = app(GenreNormalizer::class);
 
@@ -193,7 +196,7 @@ class TagesschauArticleProcessor implements ShouldQueue
     /**
      * Process markdown content to convert relative links to absolute links
      */
-    protected function processMarkdownLinks(string $markdown): string
+    private function processMarkdownLinks(string $markdown): string
     {
         // Pattern to match markdown links with relative URLs starting with '/'
         $pattern = '/\[(.*?)\]\((\/[^\s"]+)(\s+".*?")?\)/';
@@ -203,16 +206,16 @@ class TagesschauArticleProcessor implements ShouldQueue
 
         // Use Laravel's pipe method to apply the transformation
         return str($markdown)
-            ->pipe(fn ($content) => preg_replace_callback(
+            ->pipe(fn ($content): ?string => preg_replace_callback(
                 $pattern,
-                fn ($matches) => sprintf(
+                fn ($matches): string => sprintf(
                     '[%s](%s%s%s)',
                     $matches[1],             // Link text
                     $baseUrl,                // Base URL
                     $matches[2],             // URL path
                     $matches[3] ?? ''        // Optional title attribute
                 ),
-                $content
-            ));
+                (string) $content
+            ))->toString();
     }
 }

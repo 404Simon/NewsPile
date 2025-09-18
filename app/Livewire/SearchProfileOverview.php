@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Livewire;
 
 use App\Models\SearchProfile;
@@ -8,7 +10,7 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-class SearchProfileOverview extends Component
+final class SearchProfileOverview extends Component
 {
     use WithPagination;
 

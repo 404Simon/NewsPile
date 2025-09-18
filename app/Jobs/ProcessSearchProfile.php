@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Jobs;
 
 use App\Models\Article;
@@ -9,7 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
-class ProcessSearchProfile implements ShouldQueue
+final class ProcessSearchProfile implements ShouldQueue
 {
     use Queueable;
 
@@ -30,7 +32,7 @@ class ProcessSearchProfile implements ShouldQueue
         $now = Carbon::now();
         $latestExecution = $this->searchProfile->latestExecution();
 
-        $searchFrom = $latestExecution
+        $searchFrom = $latestExecution instanceof SearchProfileExecution
             ? $latestExecution->articles_checked_until
             : $now->copy()->subDay(); // First execution: look back 24 hours
 
@@ -40,7 +42,7 @@ class ProcessSearchProfile implements ShouldQueue
 
         if ($this->searchProfile->genres()->count() > 0) {
             $genreIds = $this->searchProfile->genres()->pluck('genres.id');
-            $articlesQuery->whereHas('genres', function ($query) use ($genreIds) {
+            $articlesQuery->whereHas('genres', function ($query) use ($genreIds): void {
                 $query->whereIn('genres.id', $genreIds);
             });
         }
