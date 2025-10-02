@@ -77,6 +77,12 @@
             "@php artisan migrate",
             "@php artisan app:sync-genres --force",
             "npm install"
+        ],
+        "format": "./vendor/bin/pint",
+        "lint": [
+            "./vendor/bin/phpstan analyze",
+            "./vendor/bin/rector",
+            "./vendor/bin/pint"
         ]
     },
     "extra": {
