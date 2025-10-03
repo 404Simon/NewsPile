@@ -20,9 +20,9 @@ final class SearchProfileShow extends Component
 
     public string $search = '';
 
-    public ?int $selectedGenre = null;
+    public array $selectedGenre = [];
 
-    public ?int $selectedNewsOutlet = null;
+    public array $selectedNewsOutlet = [];
 
     public function mount(SearchProfile $searchProfile): void
     {
@@ -42,11 +42,11 @@ final class SearchProfileShow extends Component
             })
             ->when($this->selectedGenre, function ($query): void {
                 $query->whereHas('genres', function ($q): void {
-                    $q->where('genre_id', $this->selectedGenre);
+                    $q->whereIn('genre_id', $this->selectedGenre);
                 });
             })
             ->when($this->selectedNewsOutlet, function ($query): void {
-                $query->where('news_outlet_id', $this->selectedNewsOutlet);
+                $query->whereIn('news_outlet_id', $this->selectedNewsOutlet);
             })
             ->latest('published_at')
             ->paginate(20);
@@ -84,8 +84,8 @@ final class SearchProfileShow extends Component
     public function clearFilters(): void
     {
         $this->search = '';
-        $this->selectedGenre = null;
-        $this->selectedNewsOutlet = null;
+        $this->selectedGenre = [];
+        $this->selectedNewsOutlet = [];
         $this->resetPage();
     }
 }
