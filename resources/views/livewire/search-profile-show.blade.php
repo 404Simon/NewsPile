@@ -41,7 +41,7 @@
             <div>
                 <label for="genre"
                     class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">Genre</label>
-                <x-multi-select 
+                <x-multi-select
                     wire-model="selectedGenre"
                     placeholder="All Genres"
                     :options="$genres->map(fn($genre) => ['value' => $genre->id, 'label' => $genre->name])->toArray()"
@@ -53,7 +53,7 @@
             <div>
                 <label for="outlet" class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">News
                     Outlet</label>
-                <x-multi-select 
+                <x-multi-select
                     wire-model="selectedNewsOutlet"
                     placeholder="All News Outlets"
                     :options="$newsOutlets->map(fn($outlet) => ['value' => $outlet->id, 'label' => $outlet->name])->toArray()"
@@ -63,7 +63,7 @@
         </div>
     </div>
 
-    <!-- Articles Table -->
+    <!-- Articles -->
     @if ($articles->isEmpty())
         <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-md overflow-hidden p-6 text-center">
             <div class="flex flex-col items-center justify-center py-12">
@@ -81,7 +81,57 @@
             </div>
         </div>
     @else
-        <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-md overflow-hidden">
+        <!-- Mobile Card Layout -->
+        <div class="block lg:hidden space-y-4">
+            @foreach ($articles as $article)
+                <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow duration-150">
+                    <div class="flex items-start justify-between mb-3">
+                        <h3 class="text-sm font-medium text-zinc-900 dark:text-white leading-snug pr-2">
+                            {{ $article->title }}
+                        </h3>
+                        @if ($article->url)
+                            <a href="{{ $article->url }}" target="_blank" rel="noopener noreferrer"
+                                class="flex-shrink-0 text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14">
+                                    </path>
+                                </svg>
+                            </a>
+                        @endif
+                    </div>
+
+                    @if ($article->description)
+                        <p class="text-sm text-zinc-500 dark:text-zinc-400 mb-3 line-clamp-2">
+                            {{ Str::limit($article->description, 120) }}
+                        </p>
+                    @endif
+
+                    <div class="flex flex-wrap gap-2 mb-3">
+                        @if ($article->newsOutlet)
+                            <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200">
+                                {{ $article->newsOutlet->name }}
+                            </span>
+                        @endif
+
+                        @if ($article->genres->isNotEmpty())
+                            @foreach ($article->genres as $genre)
+                                <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
+                                    {{ $genre->name }}
+                                </span>
+                            @endforeach
+                        @endif
+                    </div>
+
+                    <div class="text-xs text-zinc-500 dark:text-zinc-400">
+                        {{ $article->published_at?->diffForHumans() ?? $article->created_at->diffForHumans() }}
+                    </div>
+                </div>
+            @endforeach
+        </div>
+
+        <!-- Desktop Table Layout -->
+        <div class="hidden lg:block bg-white dark:bg-zinc-800 rounded-lg shadow-md overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-zinc-200 dark:divide-zinc-700">
                     <thead class="bg-zinc-50 dark:bg-zinc-700">
