@@ -80,7 +80,7 @@ test('can filter articles by genre', function () {
     $profile->articles()->attach([$article1->id, $article2->id]);
 
     Livewire::test(SearchProfileShow::class, ['searchProfile' => $profile])
-        ->set('selectedGenre', $genre1->id)
+        ->set('selectedGenre', [$genre1->id])
         ->assertSee($article1->title)
         ->assertDontSee($article2->title);
 });
@@ -104,7 +104,7 @@ test('can filter articles by news outlet', function () {
     $profile->articles()->attach([$article1->id, $article2->id]);
 
     Livewire::test(SearchProfileShow::class, ['searchProfile' => $profile])
-        ->set('selectedNewsOutlet', $outlet1->id)
+        ->set('selectedNewsOutlet', [$outlet1->id])
         ->assertSee($article1->title)
         ->assertDontSee($article2->title);
 });
@@ -126,12 +126,12 @@ test('can clear all filters', function () {
 
     Livewire::test(SearchProfileShow::class, ['searchProfile' => $profile])
         ->set('search', 'test')
-        ->set('selectedGenre', $genre->id)
-        ->set('selectedNewsOutlet', $newsOutlet->id)
+        ->set('selectedGenre', [$genre->id])
+        ->set('selectedNewsOutlet', [$newsOutlet->id])
         ->call('clearFilters')
         ->assertSet('search', '')
-        ->assertSet('selectedGenre', null)
-        ->assertSet('selectedNewsOutlet', null);
+        ->assertSet('selectedGenre', [])
+        ->assertSet('selectedNewsOutlet', []);
 });
 
 test('cannot view other users search profiles', function () {
