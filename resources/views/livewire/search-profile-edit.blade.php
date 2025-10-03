@@ -37,17 +37,8 @@
                 </p>
                 <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                     @foreach ($genres as $genre)
-                        <label class="relative flex items-start py-2">
-                            <div class="min-w-0 flex-1 text-sm">
-                                <div class="flex items-center">
-                                    <input id="genre-{{ $genre->id }}" type="checkbox" wire:model="selectedGenres"
-                                        value="{{ $genre->id }}"
-                                        class="h-4 w-4 rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500 dark:border-zinc-600 dark:bg-zinc-700 dark:focus:ring-indigo-600 dark:focus:ring-offset-zinc-800">
-                                    <span
-                                        class="ml-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">{{ $genre->name }}</span>
-                                </div>
-                            </div>
-                        </label>
+                        <flux:checkbox wire:model="selectedGenres" value="{{ $genre->id }}"
+                            label="{{ $genre->name }}" />
                     @endforeach
                 </div>
             </div>
@@ -62,32 +53,21 @@
                 </p>
                 <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                     @foreach ($newsOutlets as $outlet)
-                        <label class="relative flex items-start py-2">
-                            <div class="min-w-0 flex-1 text-sm">
-                                <div class="flex items-center">
-                                    <input id="outlet-{{ $outlet->id }}" type="checkbox"
-                                        wire:model="selectedNewsOutlets" value="{{ $outlet->id }}"
-                                        class="h-4 w-4 rounded border-zinc-300 text-emerald-600 focus:ring-emerald-500 dark:border-zinc-600 dark:bg-zinc-700 dark:focus:ring-emerald-600 dark:focus:ring-offset-zinc-800">
-                                    <span
-                                        class="ml-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">{{ $outlet->name }}</span>
-                                </div>
-                            </div>
-                        </label>
+                        <flux:checkbox wire:model="selectedNewsOutlets" value="{{ $outlet->id }}"
+                            label="{{ $outlet->name }}" />
                     @endforeach
                 </div>
             </div>
 
             <!-- Form Actions -->
             <div class="flex justify-end pt-4 border-t border-zinc-200 dark:border-zinc-700">
-                <a href="{{ route('profiles', absolute: false) }}"
-                    class="inline-flex justify-center py-2 px-4 border border-zinc-300 dark:border-zinc-600 shadow-sm text-sm font-medium rounded-md text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-zinc-800 mr-3"
-                    wire:navigate>
+                <flux:button href="{{ route('profiles', absolute: false) }}" variant="ghost" wire:navigate
+                    class="mr-3">
                     Cancel
-                </a>
-                <button type="submit"
-                    class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-zinc-800">
+                </flux:button>
+                <flux:button type="submit" variant="primary">
                     Update Profile
-                </button>
+                </flux:button>
             </div>
         </form>
     </div>
