@@ -12,9 +12,10 @@
     "license": "MIT",
     "require": {
         "php": "^8.4",
-        "filament/filament": "^4.0",
+        "filament/filament": "^4.1",
         "laravel/framework": "^12.30",
         "laravel/tinker": "^2.10.1",
+        "league/commonmark": "^2.7",
         "league/html-to-markdown": "^5.1",
         "livewire/flux": "^2.1.1",
         "livewire/volt": "^1.7.0",

@@ -1,4 +1,6 @@
-<div class="px-4 sm:px-6 lg:px-8 py-6">
+<div class="px-4 sm:px-6 lg:px-8 py-6" x-data="{ showModal: false, selectedArticleId: null, selectedArticleData: null }"
+     @keydown.escape.window="showModal = false; document.body.classList.remove('overflow-hidden')"
+     x-effect="if (showModal) { document.body.classList.add('overflow-hidden'); } else { document.body.classList.remove('overflow-hidden'); }">
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
         <div>
@@ -87,7 +89,10 @@
                 <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow duration-150">
                     <div class="flex items-start justify-between mb-3">
                         <h3 class="text-sm font-medium text-zinc-900 dark:text-white leading-snug pr-2">
-                            {{ $article->title }}
+                            <button @click="selectedArticleId = {{ $article->id }}; selectedArticleData = @js(['title' => $article->title, 'newsOutlet' => $article->newsOutlet?->name, 'genres' => $article->genres->pluck('name'), 'published_at' => $article->published_at?->format('M j, Y'), 'description' => $article->description, 'content' => $article->content ? (new \League\CommonMark\CommonMarkConverter())->convert($article->content)->getContent() : null, 'url' => $article->url]); showModal = true"
+                                    class="text-left hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-150">
+                                {{ $article->title }}
+                            </button>
                         </h3>
                         @if ($article->url)
                             <a href="{{ $article->url }}" target="_blank" rel="noopener noreferrer"
@@ -163,7 +168,12 @@
                                 <td class="px-6 py-4">
                                     <div class="max-w-md">
                                         <div class="text-sm font-medium text-zinc-900 dark:text-white truncate">
-                                            {{ $article->title }}
+                                            <a href="{{ route('articles.show', $article, absolute: false) }}"
+                                               @click.prevent="selectedArticleId = {{ $article->id }}; selectedArticleData = @js(['title' => $article->title, 'newsOutlet' => $article->newsOutlet?->name, 'genres' => $article->genres->pluck('name'), 'published_at' => $article->published_at?->format('M j, Y'), 'description' => $article->description, 'content' => $article->content ? (new \League\CommonMark\CommonMarkConverter())->convert($article->content)->getContent() : null, 'url' => $article->url]); showModal = true"
+                                               @click.middle=""
+                                               class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-150">
+                                                {{ $article->title }}
+                                            </a>
                                         </div>
                                         @if ($article->description)
                                             <div class="text-sm text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2">
@@ -224,4 +234,80 @@
             {{ $articles->links() }}
         </div>
     @endif
+
+    <!-- Article Modal -->
+    <div x-show="showModal" 
+         x-cloak
+         class="fixed inset-0 z-50">
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" 
+             @click="showModal = false"></div>
+
+        <!-- Modal Content -->
+        <div class="fixed inset-0 lg:inset-8 lg:mx-auto lg:max-w-4xl bg-white dark:bg-zinc-900 shadow-2xl flex flex-col lg:rounded-2xl">
+            <!-- Header with close button -->
+            <div class="flex items-center justify-between p-4 border-b border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 flex-shrink-0 lg:rounded-t-2xl">
+                <h2 class="text-lg font-semibold text-zinc-900 dark:text-white flex-1 pr-4 line-clamp-2" x-text="selectedArticleData?.title"></h2>
+                <button @click="showModal = false"
+                        class="p-2 text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors flex-shrink-0">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Scrollable Content -->
+            <div class="flex-1 overflow-y-auto overscroll-contain">
+                <div class="p-4 space-y-4">
+                    <!-- Article Meta -->
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <template x-if="selectedArticleData?.newsOutlet">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200" x-text="selectedArticleData.newsOutlet"></span>
+                        </template>
+
+                        <template x-if="selectedArticleData?.genres?.length">
+                            <template x-for="genre in selectedArticleData.genres" :key="genre">
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200" x-text="genre"></span>
+                            </template>
+                        </template>
+
+                        <template x-if="selectedArticleData?.published_at">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200" x-text="selectedArticleData.published_at"></span>
+                        </template>
+                    </div>
+
+                    <!-- Description -->
+                    <template x-if="selectedArticleData?.description">
+                        <div class="bg-zinc-50 dark:bg-zinc-800 rounded-xl p-4 mb-4">
+                            <p class="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed" x-text="selectedArticleData.description"></p>
+                        </div>
+                    </template>
+
+                    <!-- Content -->
+                    <template x-if="selectedArticleData?.content">
+                        <div class="prose prose-sm prose-zinc dark:prose-invert max-w-none" x-html="selectedArticleData.content"></div>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Bottom Action Bar -->
+            <div class="p-4 border-t border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 flex gap-3 flex-shrink-0 lg:rounded-b-2xl">
+                <template x-if="selectedArticleData?.url">
+                    <a :href="selectedArticleData.url" target="_blank" rel="noopener noreferrer"
+                       class="flex-1 inline-flex items-center justify-center px-4 py-3 bg-indigo-600 dark:bg-indigo-500 border border-transparent rounded-xl font-semibold text-sm text-white hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                        </svg>
+                        Read Original
+                    </a>
+                </template>
+                <button @click="navigator.share ? navigator.share({title: selectedArticleData?.title, url: window.location.origin + '/articles/' + selectedArticleId}) : navigator.clipboard.writeText(window.location.origin + '/articles/' + selectedArticleId).then(() => alert('Link copied!'))"
+                        class="px-4 py-3 bg-zinc-100 dark:bg-zinc-700 border border-transparent rounded-xl font-semibold text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-600 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
 </div>

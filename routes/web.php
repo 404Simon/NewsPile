@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Livewire\ArticleView;
 use App\Livewire\SearchProfileEdit;
 use App\Livewire\SearchProfileForm;
 use App\Livewire\SearchProfileOverview;
@@ -14,6 +15,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
+
+Route::get('articles/{article}', ArticleView::class)->name('articles.show');
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
