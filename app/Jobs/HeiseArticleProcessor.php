@@ -7,6 +7,7 @@ namespace App\Jobs;
 use App\Models\Article;
 use App\Services\GenreNormalizer;
 use DOMDocument;
+use DOMElement;
 use DOMXPath;
 use Exception;
 use Illuminate\Bus\Queueable;
@@ -17,11 +18,10 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use League\HTMLToMarkdown\HtmlConverter;
 use Throwable;
 
-final class SpiegelArticleProcessor implements ShouldQueue
+final class HeiseArticleProcessor implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -76,16 +76,34 @@ final class SpiegelArticleProcessor implements ShouldQueue
                 $xpath = new DOMXPath($dom);
 
                 $content = '';
-                $elements = $xpath->query('//div[contains(concat(" ", normalize-space(@class), " "), " RichText ")]');
 
-                if ($elements && $elements->length > 0) {
-                    foreach ($elements as $element) {
-                        $content .= $dom->saveHTML($element);
+                $articleNode = $xpath->query("//div[@class='article-content']")->item(0);
+
+                if ($articleNode instanceof DOMElement) {
+                    $xpathsToRemove = [
+                        './/footer',
+                        ".//div[@id='wtma_teaser_ho_vertrieb_inline_branding']",
+                        ".//details[contains(@class, 'notice-banner')]",
+                        ".//div[contains(@class, 'ad')]",
+                        ".//p/span[contains(@class, 'redakteurskuerzel')]",
+                        ".//div/div[@data-component='RecommendationBox']",
+                        './/a-collapse',
+                        ".//div/div/div/div/div[@data-component='NewsletterModule']",
+                        ".//img[starts-with(@src, 'data:image/svg')]",
+                    ];
+
+                    foreach ($xpathsToRemove as $xpathQuery) {
+                        foreach ($xpath->query($xpathQuery, $articleNode) as $node) {
+                            $node->parentNode?->removeChild($node);
+                        }
                     }
+
+                    // Save cleaned-up article node
+                    $content = $dom->saveHTML($articleNode);
                 }
 
-                $urlGenres = $this->extractGenresFromUrl($url);
-                $normalizedGenres = $this->normalizeGenres($urlGenres);
+                $genres = $this->extractGenresFromHTML($xpath);
+                $normalizedGenres = $this->normalizeGenres($genres);
 
                 if ($content !== '' && $content !== '0') {
                     $converter = new HtmlConverter(['strip_tags' => true, 'header_style' => 'atx']);
@@ -145,25 +163,39 @@ final class SpiegelArticleProcessor implements ShouldQueue
     }
 
     /**
-     * Extract genres from URL segments
+     * Extract genres from the article HTML via DOMXPath
      */
-    private function extractGenresFromUrl(string $url): Collection
+    private function extractGenresFromHTML(DOMXPath $xpath): Collection
     {
-        $parsedUrl = parse_url($url);
+        $genres = collect();
 
-        if (! isset($parsedUrl['path'])) {
-            return collect();
+        try {
+            $topicNodes = $xpath->query("//ul[contains(@class, 'topics--follow')]//a-topic//a");
+
+            if ($topicNodes && $topicNodes->length > 0) {
+                foreach ($topicNodes as $node) {
+                    $genreName = mb_trim($node->textContent ?? '');
+
+                    if ($genreName !== '') {
+                        $genres->push($genreName);
+                    }
+                }
+            }
+
+        } catch (Throwable $e) {
+            Log::error('Failed to extract genres from HTML: '.$e->getMessage(), [
+                'exception' => $e::class,
+                'trace' => $e->getTraceAsString(),
+            ]);
         }
 
-        $path = $parsedUrl['path'];
-
-        return collect(explode('/', $path))
-            ->filter()
-            ->filter(fn (string $segment): bool => ! Str::contains($segment, '.html') && mb_strlen($segment) > 2);
+        return $genres->unique()->values();
     }
 
     /**
      * Normalize genres using the GenreNormalizer service
+     *
+     * @param  Collection<array-key,mixed>  $rawGenres
      */
     private function normalizeGenres(Collection $rawGenres): Collection
     {
