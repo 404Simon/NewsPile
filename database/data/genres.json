@@ -70,5 +70,18 @@
             "arts",
             "culture"
         ]
+    },
+    {
+        "name": "Politik",
+        "synonyms": [
+            "aktuelles"
+        ]
+    },
+    {
+        "name": "Politikanalyse",
+        "synonyms": [
+            "analyse",
+            "faktencheck"
+        ]
     }
 ]
