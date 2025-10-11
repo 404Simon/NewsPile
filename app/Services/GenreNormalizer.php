@@ -93,7 +93,7 @@ final class GenreNormalizer
             }
         }
 
-        // no reaasonable match
+        // no reasonable match
         Log::info("Could not match $rawGenre");
 
         return null;
